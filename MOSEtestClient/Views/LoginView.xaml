@@ -1,0 +1,44 @@
+﻿<Window x:Class="MOSEtestClient.Views.LoginView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MOSEtestClient.Views"
+        xmlns:vm="clr-namespace:MOSEtestClient.ModelViews"
+        xmlns:utility="clr-namespace:MOSEtestClient.Utilities"
+         xmlns:fa="http://schemas.fontawesome.io/icons/"
+        mc:Ignorable="d"
+        Title="LoginView" Height="270" Width="300" Style="{StaticResource {x:Type Window}}" 
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+    <Window.DataContext>
+        <vm:ExamModelView></vm:ExamModelView>
+    </Window.DataContext>
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+            <RowDefinition Height="60"></RowDefinition>
+            <RowDefinition Height="60"></RowDefinition>
+            <RowDefinition Height="40"></RowDefinition>
+            <RowDefinition Height="25"></RowDefinition>
+        </Grid.RowDefinitions>
+        <TextBlock Style="{StaticResource headings}">Login</TextBlock>
+
+        <StackPanel Grid.Row="1" >
+            <TextBlock Margin="8 0 0 0">User Name</TextBlock>
+            <TextBox Height="30" Text="{Binding loginModel.username,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+        </StackPanel>
+
+        <StackPanel Grid.Row="2">
+            <TextBlock Margin="8 0 0 0">Password</TextBlock>
+            <PasswordBox Grid.Column="1" Grid.Row="2" Height="30" Margin="5"  utility:PasswordBoxAssistant.BindPassword="True" 
+                     utility:PasswordBoxAssistant.BoundPassword="{Binding Path=loginModel.pwd,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PasswordChar="*" />
+        </StackPanel>
+
+        <StackPanel  Grid.Row="3" Grid.Column="3" Orientation="Horizontal" HorizontalAlignment="Right">
+            <fa:ImageAwesome Icon="Refresh" Spin="True" Visibility="{Binding isSpin,Mode=TwoWay}" Height="20" Width="30" />
+            <Button Style="{StaticResource btnSubmitStyle}" Width="120" Grid.Column="1" Command="{Binding loginPageCommand}"
+                    Height="Auto" IsDefault="True" >Login</Button>
+        </StackPanel>
+
+    </Grid>
+</Window>

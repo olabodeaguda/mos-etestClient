@@ -1,0 +1,81 @@
+﻿<Window x:Class="MOSEtestClient.Views.ExamView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MOSEtestClient.Views"
+         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+        xmlns:vm="clr-namespace:MOSEtestClient.ModelViews"
+        mc:Ignorable="d"
+        Title="Exam" Height="{Binding winHeight}" Width="{Binding winWidth}" WindowState="Maximized" Style="{StaticResource {x:Type Window}}" 
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize"  >
+    <Window.DataContext>
+        <vm:ExamModelView></vm:ExamModelView>
+    </Window.DataContext>
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding loadCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    
+    <Window.Resources>
+        <ItemsPanelTemplate x:Key="ListBox_HorizontalItems" >
+            <StackPanel Orientation="Vertical"  />
+        </ItemsPanelTemplate>
+
+        <DataTemplate x:Key="ListBox_DataTemplate">
+            <WrapPanel  VerticalAlignment="Top" >
+                <RadioButton GroupName="vv" IsChecked="{Binding Path=IsSelected,
+                                RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}},Mode=TwoWay}" Content="{Binding optionType}" />
+                <Image Width="50" Height="50" Source="{Binding pictureFullUrl}"   Visibility="{Binding picVisible}" ></Image>
+                <TextBlock Margin="5,0,0,0" Width="300" TextWrapping="Wrap" Text="{Binding option_name}"
+                             ></TextBlock>
+            </WrapPanel>
+        </DataTemplate>
+        <Style x:Key="ListBox_Style_Horizontal" TargetType="ListBox">
+            <Setter Property="ItemTemplate" Value="{StaticResource ListBox_DataTemplate}" />
+            <Setter Property="ItemsPanel" Value="{StaticResource ListBox_HorizontalItems}" />
+        </Style>
+    </Window.Resources>
+    <Grid Margin="5">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"></RowDefinition>
+                <RowDefinition Height="50"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="55"></RowDefinition>
+            </Grid.RowDefinitions>
+            <TextBlock  Style="{StaticResource headings}" Text="Start Exam"/>
+            <TextBlock  Style="{StaticResource headings2}" Text="{Binding selectedQuestion.questionTitle}" Grid.Row="1" Margin="0 3 0 3" HorizontalAlignment="Center"></TextBlock>
+            <Grid Grid.Row="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition Height="100"></RowDefinition>
+                </Grid.RowDefinitions>
+                <StackPanel Width="{Binding QWidth}">
+                    <Image Width="450" Height="278" Source="{Binding selectedQuestion.pictureUrl}" Visibility="{Binding pictureVisible}" Margin="125,0"></Image>
+                    <TextBlock Text="{Binding selectedQuestion.question_name}" Visibility="{Binding selectedQuestion.txtVisible,Mode=TwoWay}"  TextWrapping="WrapWithOverflow" ></TextBlock>
+                </StackPanel>
+                <ListBox Grid.Row="1" SelectedItem="{Binding selectedQuestion.q_type}" BorderBrush="Transparent" BorderThickness="0" SelectionMode="Single" 
+                ItemsSource="{Binding selectedQuestion.questionoption}" 
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
+                     Style="{StaticResource ListBox_Style_Horizontal}">
+                </ListBox>
+            </Grid>
+            <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
+                <ComboBox HorizontalAlignment="Left" Width="100" 
+                      SelectedValue="{Binding selectedQuestion.index, Mode=TwoWay}"  
+                       Grid.Column="1" ItemsSource="{Binding QuestionCount}" 
+                  Height="50"></ComboBox>
+                <Button Height="50" Width="100" Command="{Binding previousCommand}">Previous</Button>
+                <Button Height="50" Width="100" Command="{Binding nextCommand}">Next</Button>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>
