@@ -59,8 +59,9 @@
                     <RowDefinition Height="100"></RowDefinition>
                 </Grid.RowDefinitions>
                 <StackPanel Width="{Binding QWidth}">
-                    <Image Width="450" Height="278" Source="{Binding selectedQuestion.pictureUrl}" Visibility="{Binding pictureVisible}" Margin="125,0"></Image>
-                    <TextBlock Text="{Binding selectedQuestion.question_name}" Visibility="{Binding selectedQuestion.txtVisible,Mode=TwoWay}"  TextWrapping="WrapWithOverflow" ></TextBlock>
+                    <Image VerticalAlignment="Top" Width="450" Height="278" Source="{Binding selectedQuestion.pictureUrl}" Visibility="{Binding pictureVisible}" Margin="125,0"></Image>
+                    <TextBlock  VerticalAlignment="Top" Text="{Binding selectedQuestion.question_name}"
+                                Visibility="{Binding selectedQuestion.txtVisible,Mode=TwoWay}"  TextWrapping="WrapWithOverflow" ></TextBlock>
                 </StackPanel>
                 <ListBox Grid.Row="1" SelectedItem="{Binding selectedQuestion.q_type}" BorderBrush="Transparent" BorderThickness="0" SelectionMode="Single" 
                 ItemsSource="{Binding selectedQuestion.questionoption}" 
