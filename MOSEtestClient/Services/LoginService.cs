@@ -38,7 +38,6 @@ namespace MOSEtestClient.Services
             {
                 throw new Exception(result.msg);
             }
-
         }
 
     }

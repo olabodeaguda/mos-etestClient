@@ -58,6 +58,7 @@ namespace MOSEtestClient.ModelViews
             set
             {
                 _isVisibleRefresh = value;
+                this.NotifyPropertyChanged("isVisibleRefresh");
             }
         }
 
@@ -88,7 +89,7 @@ namespace MOSEtestClient.ModelViews
                     catch (Exception x)
                     {
                         isSpin = Visibility.Collapsed;
-                        this.isVisibleRefresh = Visibility.Visible;
+                        isEnabled = false;
                         MessageBox.Show(x.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 });
@@ -247,12 +248,14 @@ namespace MOSEtestClient.ModelViews
                     List<AnswerModel> lst = new List<AnswerModel>();
                     foreach (var tm in questions)
                     {
-                        AnswerModel ansmodel = new AnswerModel()
+                        if (tm.q_type == null || tm.q_type.Id == 0)
                         {
-                            id = tm.id,
-                            optionType = tm.q_type.optionType,
-                            answer = tm.q_type.Id.ToString()
-                        };
+                            continue;
+                        }
+                        AnswerModel ansmodel = new AnswerModel();
+                        ansmodel.id = tm.id;
+                        ansmodel.optionType = tm.q_type.optionType;
+                        ansmodel.answer = tm.q_type.Id.ToString();
                         lst.Add(ansmodel);
                     }
                     submitmodel.answers = lst.ToArray();
