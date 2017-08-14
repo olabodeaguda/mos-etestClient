@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:MOSEtestClient.Views"
          xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         xmlns:vm="clr-namespace:MOSEtestClient.ModelViews"
+        xmlns:fa="http://schemas.fontawesome.io/icons/"
         mc:Ignorable="d"
         Title="Exam" Height="{Binding winHeight}" Width="{Binding winWidth}" WindowState="Maximized" Style="{StaticResource {x:Type Window}}" 
         WindowStartupLocation="CenterScreen" ResizeMode="NoResize"  >
@@ -40,9 +41,24 @@
     </Window.Resources>
     <Grid Margin="5">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200"></ColumnDefinition>
+            <ColumnDefinition Width="250"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="120"></RowDefinition>
+                <RowDefinition  Height="200"></RowDefinition>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+            <TextBlock Foreground="White" FontSize="15" Text="{Binding profile.displayName}" Margin=" 2 10 2 5"></TextBlock>
+            <TextBlock Grid.Row="1" VerticalAlignment="top" Margin="10,0,0,0" Text="{Binding pTime,Mode=TwoWay}" FontWeight="ExtraBlack"
+                        FontSize="25" Foreground="Red" Height="80" Width="232" TextAlignment="Center"></TextBlock>
+            <StackPanel Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Top" Height="60" HorizontalAlignment="Center">
+                <Button IsEnabled="{Binding enableStartExam,Mode=TwoWay}" Command="{Binding StartCommand}" Width="100" Height="50">Start</Button>
+                <Button IsEnabled="{Binding enableSubmitExam,Mode=TwoWay}" Command="{Binding SubmitCommand}" Width="100" Height="50">Submit</Button>
+            </StackPanel>
+        </Grid>
+        
 
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
@@ -56,13 +72,13 @@
             <Grid Grid.Row="2">
                 <Grid.RowDefinitions>
                     <RowDefinition></RowDefinition>
-                    <RowDefinition Height="100"></RowDefinition>
+                    <RowDefinition ></RowDefinition>
                 </Grid.RowDefinitions>
-                <StackPanel Width="{Binding QWidth}">
+                <!--<StackPanel Width="{Binding QWidth}"></StackPanel>-->
                     <Image VerticalAlignment="Top" Width="450" Height="278" Source="{Binding selectedQuestion.pictureUrl}" Visibility="{Binding pictureVisible}" Margin="125,0"></Image>
-                    <TextBlock  VerticalAlignment="Top" Text="{Binding selectedQuestion.question_name}"
+                <TextBlock Width="{Binding QWidth}" Margin="5 15 5 5" VerticalAlignment="Top" Text="{Binding selectedQuestion.question_name}"
                                 Visibility="{Binding selectedQuestion.txtVisible,Mode=TwoWay}"  TextWrapping="WrapWithOverflow" ></TextBlock>
-                </StackPanel>
+                
                 <ListBox Grid.Row="1" SelectedItem="{Binding selectedQuestion.q_type}" BorderBrush="Transparent" BorderThickness="0" SelectionMode="Single" 
                 ItemsSource="{Binding selectedQuestion.questionoption}" 
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
@@ -70,12 +86,19 @@
                 </ListBox>
             </Grid>
             <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
-                <ComboBox HorizontalAlignment="Left" Width="100" 
-                      SelectedValue="{Binding selectedQuestion.index, Mode=TwoWay}"  
+                <ComboBox HorizontalAlignment="Left" Width="100"
+                      SelectedValue="{Binding selectedQuestion.displayIndex, Mode=TwoWay}"  
                        Grid.Column="1" ItemsSource="{Binding QuestionCount}" 
-                  Height="50"></ComboBox>
+                  Height="50">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="SelectionChanged">
+                            <i:InvokeCommandAction Command="{Binding selectedIndexCommand}" CommandParameter="{Binding selectedQuestion.displayIndex}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </ComboBox>
                 <Button Height="50" Width="100" Command="{Binding previousCommand}">Previous</Button>
                 <Button Height="50" Width="100" Command="{Binding nextCommand}">Next</Button>
+                <fa:ImageAwesome VerticalAlignment="Center" Icon="Refresh" Spin="True" Visibility="{Binding isSpin,Mode=TwoWay}" Height="20" Width="30" />
             </StackPanel>
         </Grid>
     </Grid>

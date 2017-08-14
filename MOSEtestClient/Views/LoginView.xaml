@@ -8,11 +8,17 @@
         xmlns:utility="clr-namespace:MOSEtestClient.Utilities"
          xmlns:fa="http://schemas.fontawesome.io/icons/"
         mc:Ignorable="d"
+         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         Title="LoginView" Height="270" Width="300" Style="{StaticResource {x:Type Window}}" 
         WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
     <Window.DataContext>
         <vm:ExamModelView></vm:ExamModelView>
     </Window.DataContext>
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding loginLoadCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <Grid Margin="5">
         <Grid.RowDefinitions>
             <RowDefinition></RowDefinition>
@@ -34,11 +40,20 @@
                      utility:PasswordBoxAssistant.BoundPassword="{Binding Path=loginModel.pwd,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PasswordChar="*" />
         </StackPanel>
 
-        <StackPanel  Grid.Row="3" Grid.Column="3" Orientation="Horizontal" HorizontalAlignment="Right">
-            <fa:ImageAwesome Icon="Refresh" Spin="True" Visibility="{Binding isSpin,Mode=TwoWay}" Height="20" Width="30" />
-            <Button Style="{StaticResource btnSubmitStyle}" Width="120" Grid.Column="1" Command="{Binding loginPageCommand}"
-                    Height="Auto" IsDefault="True" >Login</Button>
-        </StackPanel>
-
+        <Grid Grid.Row="3" Grid.Column="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="65*"></ColumnDefinition>
+                <ColumnDefinition Width="77*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Button Visibility="{Binding isVisibleRefresh}" Style="{StaticResource btnSubmitStyle}" Width="Auto" 
+                    Command="{Binding loginLoadCommand}"
+                    Height="Auto" IsDefault="True" Margin="18,0,20.6,0" >Refresh</Button>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0.2,0" Width="150">
+                <fa:ImageAwesome Icon="Refresh" Spin="True" Visibility="{Binding isSpin,Mode=TwoWay}" Height="20" Width="30" />
+                <Button Style="{StaticResource btnSubmitStyle}" Width="120" Grid.Column="1" 
+                        Command="{Binding loginPageCommand}"
+                    Height="Auto" IsDefault="True" IsEnabled="{Binding isEnabled,Mode=TwoWay}" >Login</Button>
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>

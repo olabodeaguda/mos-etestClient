@@ -150,7 +150,7 @@ namespace MOSEtestClient.Models
             }
         }
 
-        private int _index = 1;
+        private int _index = -1;
 
         public int index
         {
@@ -158,15 +158,43 @@ namespace MOSEtestClient.Models
             set
             {
                 _index = value;
+                if (displayIndex != (value + 1))
+                {
+                    displayIndex = value + 1;
+                }
                 this.NotifyPropertyChanged("index");
             }
         }
+
+        private int _displayIndex;
+
+        public int displayIndex
+        {
+            get
+            {
+                return _displayIndex;
+            }
+            set
+            {
+                if (value == 0)
+                {
+                    value = 1;
+                }
+                _displayIndex = value;
+                if (index != (value - 1))
+                {
+                    index = value - 1;
+                }
+                this.NotifyPropertyChanged("displayIndex");
+            }
+        }
+
 
         public string questionTitle
         {
             get
             {
-                return $"Question Number {index}";
+                return $"Question Number {index + 1}";
             }
         }
 

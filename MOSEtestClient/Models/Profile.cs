@@ -92,6 +92,26 @@ namespace MOSEtestClient.Models
             }
         }
 
+        public string displayName
+        {
+            get
+            {
+                return $"Welcome {surname} {firstname} {lastname}";
+            }
+        }
+
+        private string _remoteUrl;
+
+        public string remoteUrl
+        {
+            get { return _remoteUrl; }
+            set
+            {
+                _remoteUrl = value;
+                this.NotifyPropertyChanged("remoteUrl");
+            }
+        }
+
 
         #region property change
 

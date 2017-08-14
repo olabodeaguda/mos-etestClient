@@ -38,6 +38,8 @@ namespace MOSEtestClient.Dao
             loginM.surname = config.AppSettings.Settings["surname"]?.Value;
             loginM.lastname = config.AppSettings.Settings["lastname"]?.Value;
             loginM.status = config.AppSettings.Settings["status"]?.Value;
+            loginM.remoteUrl = config.AppSettings.Settings["remoteUrl"]?.Value;
+
             int qCount = 100;
             if (int.TryParse(config.AppSettings.Settings["questionCount"]?.Value, out qCount))
             {

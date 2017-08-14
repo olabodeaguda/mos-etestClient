@@ -23,6 +23,8 @@
             <ColumnDefinition></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <TextBlock  Style="{StaticResource headings}" Text="INSTRUCTIONS"/>
+        <TextBlock Style="{StaticResource headings2}" TextWrapping="Wrap" 
+                   Grid.Column="1" Text="{Binding profile.displayName}"></TextBlock>
         <StackPanel Orientation="Vertical" Grid.Row="1" Margin="0,0,10,0">
             <TextBlock FontWeight="Bold" > Guidelines</TextBlock>
 

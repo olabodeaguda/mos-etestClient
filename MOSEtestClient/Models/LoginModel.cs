@@ -20,15 +20,15 @@ namespace MOSEtestClient.Models
                 this.NotifyPropertyChanged("username");
             }
         }
-        private string _password;
+        private string _pwd;
 
-        public string password
+        public string pwd
         {
-            get { return _password; }
+            get { return _pwd; }
             set
             {
-                _password = value;
-                this.NotifyPropertyChanged("password");
+                _pwd = value;
+                this.NotifyPropertyChanged("pwd");
             }
         }
 
