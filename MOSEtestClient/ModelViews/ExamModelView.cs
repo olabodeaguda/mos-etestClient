@@ -98,7 +98,6 @@ namespace MOSEtestClient.ModelViews
 
         #endregion
 
-
         public AppConfigDao appConfigDao
         {
             get
@@ -195,8 +194,6 @@ namespace MOSEtestClient.ModelViews
             }
         }
 
-
-
         public DelegateCommand<object> StartCommand
         {
             get
@@ -241,55 +238,69 @@ namespace MOSEtestClient.ModelViews
                         return;
                     }
                     //contact remote and submit data
-                    SubmitModel submitmodel = new SubmitModel();
-                    submitmodel.username = profile.username;
-                    submitmodel.submisionDate = DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss");
-                    submitmodel.userId = profile.id;
-                    List<AnswerModel> lst = new List<AnswerModel>();
-                    foreach (var tm in questions)
+                    try
                     {
-                        if (tm.q_type == null || tm.q_type.Id == 0)
+                        SubmitModel submitmodel = new SubmitModel();
+                        submitmodel.username = profile.username;
+                        submitmodel.submisionDate = DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss");
+                        submitmodel.userId = profile.id;
+                        List<AnswerModel> lst = new List<AnswerModel>();
+                        foreach (var tm in questions)
                         {
-                            continue;
-                        }
-                        AnswerModel ansmodel = new AnswerModel();
-                        ansmodel.id = tm.id;
-                        ansmodel.optionType = tm.q_type.optionType;
-                        ansmodel.answer = tm.q_type.Id.ToString();
-                        lst.Add(ansmodel);
-                    }
-                    submitmodel.answers = lst.ToArray();
-
-                    bool result = await submitExamService.SubmitExam(submitmodel);
-                    if (result)
-                    {
-                        MessageBox.Show("You exam have been submit successfully", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-
-                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-                        {
-                            var r = Application.Current.Windows.OfType<Window>().FirstOrDefault();
-
-                            if (r != null)
+                            if (tm.q_type == null || tm.q_type.Id == 0)
                             {
-                                LoginView ev = new LoginView();
-                                ev.DataContext = new ExamModelView();
-                                ev.Show();
-                                r.Close();
+                                continue;
                             }
-                        }));
+                            AnswerModel ansmodel = new AnswerModel();
+                            ansmodel.id = tm.id;
+                            ansmodel.optionType = tm.q_type.optionType;
+                            ansmodel.answer = tm.q_type.Id.ToString();
+                            lst.Add(ansmodel);
+                        }
+                        submitmodel.answers = lst.ToArray();
+
+                        bool result = await submitExamService.SubmitExam(submitmodel);
+                        if (result)
+                        {
+                            MessageBox.Show("Your exam have been submit successfully", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                            await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                            {
+                                var r = Application.Current.Windows.OfType<Window>().FirstOrDefault();
+
+                                if (r != null)
+                                {
+                                    LoginView ev = new LoginView();
+                                    ev.DataContext = new ExamModelView();
+                                    ev.Show();
+                                    r.Close();
+                                }
+                            }));
+                        }
+                        else
+                        {
+                            //save to db
+                            ResultBackUp resultBUp = new ResultBackUp();
+                            resultBUp.username = submitmodel.username;
+                            resultBUp.datecreated = DateTime.Now.ToString("dd-MM-yyyy HH mm:ss");
+                            string jsonEqui = JsonConvert.SerializeObject(submitmodel);
+                            resultBUp.content = Convert.ToBase64String(Encoding.ASCII.GetBytes(jsonEqui));
+                            resultBUp.id = submitmodel.userId;
+                            //save to db
+                            bool res = questionDao.updateBackUp(resultBUp);
+                            if (res)
+                            {
+                                MessageBox.Show("Submission can not reach remote server.Result have been archive for easy assess ", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                            }
+                            else
+                            {
+                                MessageBox.Show("Please try again. submission was not successfull", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
+                            }
+                        }
                     }
-                    else
+                    catch (Exception x)
                     {
-                        //save to db
-                        ResultBackUp resultBUp = new ResultBackUp();
-                        resultBUp.username = submitmodel.username;
-                        resultBUp.datecreated = DateTime.Now.ToString("dd-MM-yyyy HH mm:ss");
-                        string jsonEqui = JsonConvert.SerializeObject(submitmodel);
-                        resultBUp.content = Convert.ToBase64String(Encoding.ASCII.GetBytes(jsonEqui));
-
-                        //save to db
-
-                        MessageBox.Show("Please try again. submission was not successfull", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                        MessageBox.Show(x.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                 });
             }
@@ -309,8 +320,6 @@ namespace MOSEtestClient.ModelViews
             this.NotifyPropertyChanged("CurrentTime");
         }
 
-
-
         private Visibility _isSpin = Visibility.Collapsed;
 
         public Visibility isSpin
@@ -322,6 +331,80 @@ namespace MOSEtestClient.ModelViews
                 this.NotifyPropertyChanged("isSpin");
             }
         }
+
+        private Visibility _enableArchive = Visibility.Collapsed;
+
+        public Visibility enableArchive
+        {
+            get { return _enableArchive; }
+            set
+            {
+                _enableArchive = value;
+                this.NotifyPropertyChanged("enableArchive");
+            }
+        }
+
+        public DelegateCommand<object> submitArchive
+        {
+            get
+            {
+                return new DelegateCommand<object>(async (s) =>
+                {
+                    MessageBoxResult msg = MessageBox.Show("You are about to submit, are you sure?. Click \"YES\" to continue or \"NO\" to cancel.", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                    if (msg == MessageBoxResult.No)
+                    {
+                        return;
+                    }
+                    isSpin = Visibility.Visible;
+                    try
+                    {
+                        bool result = await submitExamService.SubmitExam(submitM);
+                        if (result)
+                        {
+                            MessageBox.Show("Your exam have been submit successfully", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                            //archive delete
+                            questionDao.deleteArchiveData(profile.username);
+
+                            await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                            {
+                                var r = Application.Current.Windows.OfType<Window>().FirstOrDefault();
+
+                                if (r != null)
+                                {
+                                    LoginView ev = new LoginView();
+                                    ev.DataContext = new ExamModelView();
+                                    ev.Show();
+                                    r.Close();
+                                }
+                            }));
+                        }
+                        else
+                        {
+                            MessageBox.Show("Please try again. submission was not successfull", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
+                        }
+                        isSpin = Visibility.Collapsed;
+                    }
+                    catch (Exception x)
+                    {
+                        MessageBox.Show(x.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                });
+            }
+        }
+
+        private SubmitModel _submitM = null;
+
+        public SubmitModel submitM
+        {
+            get { return _submitM; }
+            set
+            {
+                _submitM = value;
+                this.NotifyPropertyChanged("submitM");
+            }
+        }
+
 
         public DelegateCommand<object> loginPageCommand
         {
@@ -349,7 +432,11 @@ namespace MOSEtestClient.ModelViews
 
                             bool p = await loginService.ValidateUser(loginModel);
                             profile = appConfigDao.read();
-
+                            this.submitM = questionDao.getArchiveData(profile.username);
+                            if (submitM != null)
+                            {
+                                enableArchive = Visibility.Visible;
+                            }
                             isSpin = Visibility.Collapsed;
 
                             await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
@@ -397,7 +484,6 @@ namespace MOSEtestClient.ModelViews
                 this.NotifyPropertyChanged("currentQuestion");
             }
         }
-
 
         public DelegateCommand<object> loadExamPage
         {
@@ -534,7 +620,6 @@ namespace MOSEtestClient.ModelViews
                 this.NotifyPropertyChanged("selectedQuestion");
             }
         }
-
 
         ObservableCollection<Question> _questions = new ObservableCollection<Question>();
         public ObservableCollection<Question> questions

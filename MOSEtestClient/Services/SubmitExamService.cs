@@ -20,9 +20,7 @@ namespace MOSEtestClient.Services
             {
                 if (result.code == "00")
                 {
-                    JObject jb = (JObject)result.data;
-                    Profile p = jb.ToObject<Profile>();
-                    appConfigDao.updateConfig(p);
+                    appConfigDao.updateConfig(new Profile());
                     return true;
                 }
                 else

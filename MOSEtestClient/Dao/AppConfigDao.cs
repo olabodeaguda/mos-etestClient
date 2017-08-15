@@ -20,6 +20,7 @@ namespace MOSEtestClient.Dao
                 config.AppSettings.Settings["status"].Value = lm.status;
                 config.AppSettings.Settings["surname"].Value = lm.surname;
                 config.AppSettings.Settings["lastname"].Value = lm.lastname;
+                config.AppSettings.Settings["id"].Value = lm.id.ToString();
                 config.Save(ConfigurationSaveMode.Modified);
                 ConfigurationManager.RefreshSection("appSettings");
             }
@@ -39,6 +40,7 @@ namespace MOSEtestClient.Dao
             loginM.lastname = config.AppSettings.Settings["lastname"]?.Value;
             loginM.status = config.AppSettings.Settings["status"]?.Value;
             loginM.remoteUrl = config.AppSettings.Settings["remoteUrl"]?.Value;
+            loginM.id = int.Parse(config.AppSettings.Settings["id"]?.Value);
 
             int qCount = 100;
             if (int.TryParse(config.AppSettings.Settings["questionCount"]?.Value, out qCount))

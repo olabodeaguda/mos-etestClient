@@ -12,5 +12,6 @@ namespace MOSEtestClient.Models
         public string username { get; set; }
         public string datecreated { get; set; }
         public string content { get; set; }
+        public int userId { get; set; }
     }
 }

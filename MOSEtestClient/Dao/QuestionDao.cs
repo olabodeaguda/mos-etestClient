@@ -1,4 +1,6 @@
 ﻿using MOSEtestClient.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -110,13 +112,86 @@ namespace MOSEtestClient.Dao
                     q.answer = string.IsNullOrEmpty(x["answer"].ToString()) ? "1" : x["answer"].ToString();
                     q.explanation = x["explanation"].ToString();
                     q.pictureVisible = int.Parse(x["isPicture"].ToString()) == 1 || int.Parse(x["isPicture"].ToString()) == 3 ? Visibility.Visible : Visibility.Collapsed;
-                    q.txtVisible = int.Parse(x["isPicture"].ToString()) == 0 || int.Parse(x["isPicture"].ToString()) == 3 ? Visibility.Visible : Visibility.Collapsed;
+                    q.txtVisible = Visibility.Visible; //int.Parse(x["isPicture"].ToString()) == 0 || int.Parse(x["isPicture"].ToString()) == 3 ? Visibility.Visible : Visibility.Collapsed;
                     q.answerTranslation = string.Format("Answer is {0}", ans[int.Parse(q.answer) - 1]);
-                    q.questionoption = options.Where(p => p.question_Id == q.id).ToList();                    
+                    q.questionoption = options.Where(p => p.question_Id == q.id).ToList();
                     lst.Add(q);
                 }
             }
             return lst;
         }
+
+        public bool updateBackUp(ResultBackUp rb)
+        {
+            bool result = false;
+
+            string query = "insert into resultBackUp(username,dateCreated,content) values(";
+            query = query + "'" + rb.username + "',";
+            query = query + "'" + DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss") + "',";
+            query = query + "'" + rb.content + "'";
+            query = query + ")";
+            using (SQLiteConnection conn = new SQLiteConnection(ConfigurationManager.ConnectionStrings["defaultConnection"].ConnectionString))
+            {
+                conn.Open();
+                SQLiteCommand cmd = new SQLiteCommand(conn);
+                cmd.CommandText = query;
+                cmd.CommandType = CommandType.Text;
+                int count = cmd.ExecuteNonQuery();
+                if (count > 0)
+                {
+                    result = true;
+                }
+            }
+
+            return result;
+        }
+
+        public SubmitModel getArchiveData(string username)
+        {
+            using (SQLiteConnection conn = new SQLiteConnection(ConfigurationManager.ConnectionStrings["defaultConnection"].ConnectionString))
+            {
+                conn.Open();
+                DataSet dt = new DataSet();
+                SQLiteCommand cmd = new SQLiteCommand(conn);
+                cmd.CommandText = $"select * from resultBackUp where username ='{username}'";
+                cmd.CommandType = CommandType.Text;
+                SQLiteAdaptor(dt, cmd);
+                var t = dt.Tables[0].Rows.Cast<DataRow>().Select(x => new ResultBackUp()
+                {
+                    content = x["content"].ToString(),
+                    datecreated = x["dateCreated"].ToString(),
+                    username = x["username"].ToString()
+                }).FirstOrDefault();
+
+                if (t != null)
+                {
+                    string nm = t.content;
+                    byte[] b = Convert.FromBase64String(t.content);
+                    string cont = Encoding.ASCII.GetString(b);
+                    SubmitModel r = JsonConvert.DeserializeObject<SubmitModel>(cont);
+                    return r;
+                }
+            }
+            return null;
+        }
+
+        public bool deleteArchiveData(string username)
+        {
+            using (SQLiteConnection conn = new SQLiteConnection(ConfigurationManager.ConnectionStrings["defaultConnection"].ConnectionString))
+            {
+                conn.Open();
+                DataSet dt = new DataSet();
+                SQLiteCommand cmd = new SQLiteCommand(conn);
+                cmd.CommandText = $"delete from resultBackUp where username ='{username}'";
+                cmd.CommandType = CommandType.Text;
+                int count = cmd.ExecuteNonQuery();
+                if (count > 0)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
     }
 }
